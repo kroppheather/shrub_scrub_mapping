@@ -28,9 +28,9 @@ plot(img_crop[[3]], col=gray(1:100/100))
 
 
 dirSave = "K:/Environmental_Studies/hkropp/Private/aerial_40s_crop"
-for(i in 1:length(imgs)){
+#for(i in 1:length(imgs)){
   writeRaster(img_crop[[i]], paste0(dirSave,"/",imgs[i]))
-  
+} 
   
   
   
@@ -39,7 +39,7 @@ for(i in 1:length(imgs)){
   img_org[[13]] <- img_org[[13]][dimCrop2:(dims[[13]][1]-dimCrop2),dimCrop2:(dims[[13]][2]-dimCrop2), drop=FALSE]
  plot(img_org[[13]], col=grey(1:100/100))
   
-   dimCropR2 <- 2600
+   dimCropR2 <- 2650
    dimCropC2 <- 3000
    
   img_crop2 = list()
@@ -64,29 +64,19 @@ for(i in 1:length(imgs)){
 
  
  
-
+ #create raster
+ res_rast <- rast(xmin=min(xminV),xmax=max(xmaxV), ymin=min(yminV),ymax=max(ymaxV),
+                  crs="epsg:32619",
+                  res=c(0.5,0.5))
  
  plot(res_rast)
  for(i in 1:length(imgs)){
    plot(img_crop2[[i]],col=grey(1:100/100),add=TRUE,legend=FALSE)
  } 
   
-  plot(img_org[[1]], col=gray(1:100/100))
-  plot(img_org[[2]], col=gray(1:100/100))
-  plot(img_org[[3]], col=gray(1:100/100))
+
   
-  plot(img_crop2[[1]], col=gray(1:100/100))
-  plot(img_crop2[[2]], col=gray(1:100/100))
-  plot(img_crop2[[3]], col=gray(1:100/100))
-  img_crop2[[1]]
-  
-  min(xminV)
-  min(xmaxV)
-  
-  #create raster
-  res_rast <- rast(xmin=min(xminV),xmax=max(xmaxV), ymin=min(yminV),ymax=max(ymaxV),
-                       crs="epsg:32619",
-                       res=c(0.5,0.5))
+
   resamp_img <- list()
   for(i in 1:length(imgs)){
     resamp_img[[i]] <- resample(img_crop2[[i]], res_rast)
@@ -95,14 +85,20 @@ for(i in 1:length(imgs)){
   plot(resamp_img[[1]])
   
 
-  
+ #test merge 
 
 img_resamp <- do.call(merge, resamp_img)
 
-img_mos <- do.call(mosaic,  resamp_img)
 
+# mosaic
+
+rsrc <- sprc(resamp_img)
+
+img_mos <- mosaic(rsrc, fun="max")
+plot(img_mos,col=grey(1:100/100))
          
 plot(img_resamp,col=grey(1:100/100))
 plot(img_mos,col=grey(1:100/100))
   
 writeRaster(img_resamp,"K:/Environmental_Studies/hkropp/Private/aerial_40s_merge/merge_test.tif")
+writeRaster(img_mos,"K:/Environmental_Studies/hkropp/Private/aerial_40s_merge/mos_test.tif")
