@@ -1,14 +1,27 @@
 library(terra)
 library(dplyr)
 
+
 imgDir = "K:/Environmental_Studies/hkropp/Private/aerial_40s"
 imgs = list.files(imgDir, pattern=".tif")
 imgs = imgs[-grep(".xml", imgs)]
 imgs = imgs[-grep(".ovr", imgs)]
 
-img_org = rast(paste0(imgDir,"/",imgs[1]))
+dimCrop <- 1000
 
-plot(img_org, col=gray(1:100/100))
-img_org
-img_crop=img_org[-c((1:1000),(8872:9872)),-c((1:1000),(9131:10131))]
-plot(img_crop, col=gray(1:100/100))
+img_org <- list()
+img_crop <- list()
+dims <- list()
+for(i in 1:length(imgs)){
+  img_org[[i]] = rast(paste0(imgDir,"/",imgs[i]))
+  dims[[i]] <- dim(img_org[[i]])[1:2]
+  img_crop[[i]] = img_org[[i]][dimCrop:dims[[i]][1]-dimCrop,dimCrop:dims[[i]][2]-dimCrop, drop=FALSE]
+}
+
+plot(img_org[[1]], col=gray(1:100/100))
+plot(img_org[[2]], col=gray(1:100/100))
+plot(img_org[[3]], col=gray(1:100/100))
+
+plot(img_crop[[1]], col=gray(1:100/100))
+plot(img_crop[[2]], col=gray(1:100/100))
+plot(img_crop[[3]], col=gray(1:100/100))
