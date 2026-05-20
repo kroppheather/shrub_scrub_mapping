@@ -30,7 +30,79 @@ plot(img_crop[[3]], col=gray(1:100/100))
 dirSave = "K:/Environmental_Studies/hkropp/Private/aerial_40s_crop"
 for(i in 1:length(imgs)){
   writeRaster(img_crop[[i]], paste0(dirSave,"/",imgs[i]))
-              
-}
+  
+  
+  
+  
+  
+  dimCrop2 <- 2500
+  img_org[[13]] <- img_org[[13]][dimCrop2:(dims[[13]][1]-dimCrop2),dimCrop2:(dims[[13]][2]-dimCrop2), drop=FALSE]
+ plot(img_org[[13]], col=grey(1:100/100))
+  
+   dimCropR2 <- 2600
+   dimCropC2 <- 3000
+   
+  img_crop2 = list()
+  resL = list()
+  dims = list()
+ xminV = numeric()
+ xmaxV = numeric()
+ yminV = numeric()
+ ymaxV = numeric()
+  for(i in 1:length(imgs)){
+    dims[[i]] = dim(img_org[[i]])[1:2]
+    resL[[i]] = res(img_org[[i]])
+    xminV[i] = ext(img_org[[i]])[1]
+    xmaxV[i] = ext(img_org[[i]])[2]
+    yminV[i] = ext(img_org[[i]])[3]
+    ymaxV[i] = ext(img_org[[i]])[4]
+    if(i != 13){
+    img_crop2[[i]] = img_org[[i]][dimCropR2:(dims[[i]][1]-dimCropR2),dimCropC2:(dims[[i]][2]-dimCropC2), drop=FALSE]
+    }else{
+      img_crop2[[i]] = img_org[[i]][1400:(dims[[i]][1]-1400),1400:(dims[[i]][2]-1400), drop=FALSE]}
+  }
+
+ 
+ 
+
+ 
+ plot(res_rast)
+ for(i in 1:length(imgs)){
+   plot(img_crop2[[i]],col=grey(1:100/100),add=TRUE,legend=FALSE)
+ } 
+  
+  plot(img_org[[1]], col=gray(1:100/100))
+  plot(img_org[[2]], col=gray(1:100/100))
+  plot(img_org[[3]], col=gray(1:100/100))
+  
+  plot(img_crop2[[1]], col=gray(1:100/100))
+  plot(img_crop2[[2]], col=gray(1:100/100))
+  plot(img_crop2[[3]], col=gray(1:100/100))
+  img_crop2[[1]]
+  
+  min(xminV)
+  min(xmaxV)
+  
+  #create raster
+  res_rast <- rast(xmin=min(xminV),xmax=max(xmaxV), ymin=min(yminV),ymax=max(ymaxV),
+                       crs="epsg:32619",
+                       res=c(0.5,0.5))
+  resamp_img <- list()
+  for(i in 1:length(imgs)){
+    resamp_img[[i]] <- resample(img_crop2[[i]], res_rast)
+  }
+  
+  plot(resamp_img[[1]])
   
 
+  
+
+img_resamp <- do.call(merge, resamp_img)
+
+img_mos <- do.call(mosaic,  resamp_img)
+
+         
+plot(img_resamp,col=grey(1:100/100))
+plot(img_mos,col=grey(1:100/100))
+  
+writeRaster(img_resamp,"K:/Environmental_Studies/hkropp/Private/aerial_40s_merge/merge_test.tif")
